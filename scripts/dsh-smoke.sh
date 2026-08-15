@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-TGZ="${1:-$ROOT/dsh-plugin-search-1.0.0.tgz}"
+TGZ="${1:-$ROOT/dsh-plugin-search-1.1.0.tgz}"
 TMP="$(mktemp -d)"
 WEB_PID=""
 
