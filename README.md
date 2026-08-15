@@ -11,7 +11,7 @@ Plugin discoverability for [DeepSeek Harness](https://github.com/deepseek-ai/dee
 | Tool | What it does |
 |---|---|
 | `dsh_search_plugins` | Searches npm + the [awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) curated list, npm-first, deduplicated, with version + source labels. |
-| `dsh_plugin_lookup` | Exact npm lookup: latest version, description, homepage, repository, author. |
+| `dsh_plugin_lookup` | Exact lookup: npm metadata (latest version, description, homepage, repository, author), with a GitHub repository search fallback for git-only plugins. |
 | `dsh_awesome_top` | Browsers the current curated awesome list — a quick ecosystem snapshot. |
 
 ### Install
@@ -60,7 +60,7 @@ MIT © 2026 zoahdev
 | 工具 | 作用 |
 |---|---|
 | `dsh_search_plugins` | 同时搜 npm 与 [awesome-dsh-plugin](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin) 精选清单，npm 优先、去重、带版本与来源标签。 |
-| `dsh_plugin_lookup` | 精确 npm 查询：最新版本、描述、主页、仓库、作者。 |
+| `dsh_plugin_lookup` | 精确查询：npm 元数据（最新版本、描述、主页、仓库、作者），查不到时自动回退 GitHub 仓库搜索（git-only 插件也能查）。 |
 | `dsh_awesome_top` | 浏览当前精选清单，快速了解生态全貌。 |
 
 ### 安装
