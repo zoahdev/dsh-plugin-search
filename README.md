@@ -1,5 +1,7 @@
 # dsh-plugin-search
 
+[![CI](https://github.com/zoahdev/dsh-plugin-search/actions/workflows/ci.yml/badge.svg)](https://github.com/zoahdev/dsh-plugin-search/actions) [![Release](https://img.shields.io/github/v/release/zoahdev/dsh-plugin-search)](https://github.com/zoahdev/dsh-plugin-search/releases)
+
 [English](#english) · [中文](#中文)
 
 ## English
