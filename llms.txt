@@ -1,0 +1,18 @@
+# dsh-plugin-search
+
+> Plugin discoverability for DeepSeek Harness: three model tools that find and inspect dsh plugins from inside the agent — combined npm + awesome-dsh-plugin search, exact npm lookup, and curated-list browsing. Answers discussion #1715.
+
+## Key facts
+
+- Tools: `dsh_search_plugins` (npm + awesome, deduplicated), `dsh_plugin_lookup` (npm metadata), `dsh_awesome_top` (curated list)
+- Install: `dsh plugin --profile web add <tarball>` (see GitHub Releases)
+- Verification: 5 unit tests; packaged integration test executes real handlers against the real npm registry and awesome list; CI installs into a fresh dsh profile and boots `dsh web`
+
+## Key files
+
+- src/search.ts — search core (injectable fetch, TTL cache, awesome README parsing)
+- src/index.ts — plugin entry with the three tools
+
+## Community
+
+- Discussion #1715: https://github.com/deepseek-ai/deepseek-harness/discussions/1715
