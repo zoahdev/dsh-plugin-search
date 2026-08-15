@@ -25,7 +25,9 @@ export interface PackageInfo {
   homepage?: string
   repository?: string
   author?: string
-  npmUrl: string
+  npmUrl?: string
+  /** Where the metadata came from: npm registry or GitHub search fallback. */
+  source: 'npm' | 'github'
 }
 
 export interface SearchOptions {
@@ -149,24 +151,51 @@ export function createSearcher(fetchFn: FetchFn, options: SearchOptions) {
 
     /** Look up one npm package by exact name. */
     async lookupPackage(name: string, parent: AbortSignal): Promise<PackageInfo> {
-      const raw = await cached(`npm:pkg:${name}`, async () => {
-        const response = await fetchFn(`https://registry.npmjs.org/${encodeURIComponent(name)}`, timeoutSignal(parent, options.timeoutMs))
-        if (response.status === 404) throw new Error(`package not found on npm: ${name}`)
-        if (!response.ok) throw new Error(`npm lookup failed: HTTP ${response.status}`)
-        return await response.json() as Record<string, unknown>
-      })
-      const distTags = raw['dist-tags'] as Record<string, unknown> | null
-      const latest = distTags !== null && typeof distTags === 'object' ? asString(distTags.latest) : null
-      const repository = raw.repository as Record<string, unknown> | null
-      const author = raw.author as Record<string, unknown> | string | null
-      return {
-        name: asString(raw.name) ?? name,
-        version: latest ?? 'unknown',
-        description: asString(raw.description) ?? undefined,
-        homepage: asString(raw.homepage) ?? undefined,
-        repository: repository !== null && typeof repository === 'object' ? asString(repository.url) ?? undefined : undefined,
-        author: typeof author === 'string' ? author : asString((author as Record<string, unknown> | null)?.name) ?? undefined,
-        npmUrl: `https://www.npmjs.com/package/${name}`,
+      try {
+        const raw = await cached(`npm:pkg:${name}`, async () => {
+          const response = await fetchFn(`https://registry.npmjs.org/${encodeURIComponent(name)}`, timeoutSignal(parent, options.timeoutMs))
+          if (response.status === 404) throw new Error(`package not found on npm: ${name}`)
+          if (!response.ok) throw new Error(`npm lookup failed: HTTP ${response.status}`)
+          return await response.json() as Record<string, unknown>
+        })
+        const distTags = raw['dist-tags'] as Record<string, unknown> | null
+        const latest = distTags !== null && typeof distTags === 'object' ? asString(distTags.latest) : null
+        const repository = raw.repository as Record<string, unknown> | null
+        const author = raw.author as Record<string, unknown> | string | null
+        return {
+          name: asString(raw.name) ?? name,
+          version: latest ?? 'unknown',
+          description: asString(raw.description) ?? undefined,
+          homepage: asString(raw.homepage) ?? undefined,
+          repository: repository !== null && typeof repository === 'object' ? asString(repository.url) ?? undefined : undefined,
+          author: typeof author === 'string' ? author : asString((author as Record<string, unknown> | null)?.name) ?? undefined,
+          npmUrl: `https://www.npmjs.com/package/${name}`,
+          source: 'npm',
+        }
+      } catch (error) {
+        if (!(error instanceof Error) || !error.message.includes('not found on npm')) throw error
+        // Many dsh plugins are git-only; fall back to GitHub repository search.
+        const query = encodeURIComponent(`${name} in:name`)
+        const raw = await cached(`github:search:${name}`, async () => {
+          const response = await fetchFn(`https://api.github.com/search/repositories?q=${query}&per_page=1`, timeoutSignal(parent, options.timeoutMs))
+          if (!response.ok) throw new Error(`github fallback lookup failed: HTTP ${response.status}`)
+          return await response.json() as Record<string, unknown>
+        })
+        const items = Array.isArray(raw.items) ? raw.items : []
+        const repo = items[0] as Record<string, unknown> | null
+        if (repo === null || typeof repo !== 'object') {
+          throw new Error(`not found on npm or GitHub: ${name}`)
+        }
+        const owner = repo.owner as Record<string, unknown> | null
+        return {
+          name: asString(repo.full_name) ?? name,
+          version: 'git',
+          description: asString(repo.description) ?? undefined,
+          homepage: asString(repo.homepage) ?? undefined,
+          repository: asString(repo.html_url) ?? undefined,
+          author: owner !== null && typeof owner === 'object' ? asString(owner.login) ?? undefined : undefined,
+          source: 'github',
+        }
       }
     },
 
