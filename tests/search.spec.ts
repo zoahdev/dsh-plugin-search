@@ -76,11 +76,34 @@ describe('createSearcher', () => {
     })
   })
 
-  it('fails loudly on a missing package', async () => {
+  it('fails loudly when a package exists on neither npm nor GitHub', async () => {
     const fetch = mockFetch({})
     const searcher = createSearcher(fetch, options)
     await expect(searcher.lookupPackage('no-such-pkg-xyz', new AbortController().signal))
-      .rejects.toThrow(/not found on npm/)
+      .rejects.toThrow(/not found|failed/)
+  })
+
+  it('falls back to GitHub repository search for git-only plugins', async () => {
+    const fetch = mockFetch({
+      'https://api.github.com/search/repositories': {
+        items: [{
+          full_name: 'zoahdev/dsh-github-intelligence',
+          description: '185+ tools',
+          homepage: null,
+          html_url: 'https://github.com/zoahdev/dsh-github-intelligence',
+          owner: { login: 'zoahdev' },
+        }],
+      },
+    })
+    const searcher = createSearcher(fetch, options)
+    const info = await searcher.lookupPackage('dsh-github-intelligence', new AbortController().signal)
+    expect(info).toMatchObject({
+      name: 'zoahdev/dsh-github-intelligence',
+      version: 'git',
+      source: 'github',
+      author: 'zoahdev',
+    })
+    expect(info.npmUrl).toBeUndefined()
   })
 
   it('caches responses within the TTL', async () => {
