@@ -117,7 +117,7 @@ export function apply(ctx: Context, config: Config): void {
   ctx.tools.register(defineTool({
     name: 'dsh_plugin_lookup',
     description:
-      'Look up an exact npm package by name: latest version, description, homepage, repository, author, and npm URL.',
+      'Look up a plugin by exact name: npm metadata when published, with a GitHub repository search fallback for git-only plugins. Returns version, description, homepage, repository, author, and source.',
     parameters: {
       name: { type: 'string', required: true, description: 'Exact npm package name (e.g. dsh-plugin-doctor).' },
     },
@@ -132,14 +132,15 @@ export function apply(ctx: Context, config: Config): void {
           homepage: { type: 'string' },
           repository: { type: 'string' },
           author: { type: 'string' },
-          npmUrl: { type: 'string', required: true },
+          npmUrl: { type: 'string' },
+          source: { type: 'string', required: true },
         },
       },
       render: (_args, value) => [{
         type: 'text',
         text: `${value.name}@${value.version} — ${value.description ?? 'no description'}\n`
-          + `author: ${value.author ?? 'n/a'} · repo: ${value.repository ?? 'n/a'}\n`
-          + `${value.homepage ?? ''}\n${value.npmUrl}`,
+          + `source: ${value.source} · author: ${value.author ?? 'n/a'} · repo: ${value.repository ?? 'n/a'}\n`
+          + `${value.homepage ?? ''}\n${value.source === 'github' ? `GitHub: ${value.repository ?? ''}` : (value.npmUrl ?? '')}`,
       }],
     },
     async execute(args, exec) {
