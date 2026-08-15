@@ -6,14 +6,15 @@
  * npm registry and awesome list. Assertions run on every step.
  */
 
-import { mkdtempSync, rmSync, writeFileSync, existsSync } from 'node:fs'
+import { mkdtempSync, rmSync, writeFileSync, existsSync, readFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { spawnSync } from 'node:child_process'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const tgzName = 'dsh-plugin-search-1.0.0.tgz'
+const pkg = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8'))
+const tgzName = `dsh-plugin-search-${pkg.version}.tgz`
 const tgz = path.join(root, tgzName)
 
 if (!existsSync(tgz)) {
@@ -94,6 +95,15 @@ try {
     throw new Error(`unexpected dsh-tools version: ${JSON.stringify(info)}`)
   }
   if (info.name !== '@deepseek-ai/dsh-tools') throw new Error(`unexpected lookup name: ${JSON.stringify(info)}`)
+
+  console.log('[integration] executing dsh_plugin_lookup with GitHub fallback (git-only plugin)...')
+  const fallback = await lookup.execute({ name: 'dsh-github-intelligence' }, { signal })
+  if (fallback.source !== 'github' || fallback.version !== 'git') {
+    throw new Error(`unexpected GitHub fallback result: ${JSON.stringify(fallback)}`)
+  }
+  if (!String(fallback.repository).includes('github.com')) {
+    throw new Error(`fallback repository missing: ${JSON.stringify(fallback)}`)
+  }
 
   console.log('[integration] executing dsh_awesome_top against the real awesome list...')
   const top = registered.find((t) => t.name === 'dsh_awesome_top')
