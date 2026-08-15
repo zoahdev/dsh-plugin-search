@@ -26,6 +26,8 @@ jobs:
         run: pnpm test
       - name: Pack
         run: pnpm pack
+      - name: Real-registry agent-visibility check
+        run: node scripts/visibility-check.mjs
       - name: Packaged integration + real tool invocation (npm registry + awesome list)
         run: node scripts/integration-test.mjs
 
