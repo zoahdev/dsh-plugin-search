@@ -1,0 +1,5 @@
+- insert:
+    - id: plugin-search
+      name: dsh-plugin-search
+      config:
+        defaultLimit: 8
