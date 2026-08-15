@@ -18,9 +18,9 @@ Plugin discoverability for [DeepSeek Harness](https://github.com/deepseek-ai/dee
 
 ```sh
 # from GitHub (this repository, after release)
-dsh plugin --profile web add https://github.com/zoahdev/dsh-plugin-search/releases/download/v1.0.0/dsh-plugin-search-1.0.0.tgz
+dsh plugin --profile web add https://github.com/zoahdev/dsh-plugin-search/releases/download/v1.1.0/dsh-plugin-search-1.1.0.tgz
 # or from a local build
-dsh plugin --profile web add ./dsh-plugin-search-1.0.0.tgz
+dsh plugin --profile web add ./dsh-plugin-search-1.1.0.tgz
 ```
 
 Then ask the agent inside DSH:
@@ -67,9 +67,9 @@ MIT © 2026 zoahdev
 
 ```sh
 # 从 GitHub Release
-dsh plugin --profile web add https://github.com/zoahdev/dsh-plugin-search/releases/download/v1.0.0/dsh-plugin-search-1.0.0.tgz
+dsh plugin --profile web add https://github.com/zoahdev/dsh-plugin-search/releases/download/v1.1.0/dsh-plugin-search-1.1.0.tgz
 # 或本地构建
-dsh plugin --profile web add ./dsh-plugin-search-1.0.0.tgz
+dsh plugin --profile web add ./dsh-plugin-search-1.1.0.tgz
 ```
 
 然后在 DSH 里对 agent 说：
