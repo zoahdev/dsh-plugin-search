@@ -46,4 +46,4 @@ jobs:
       - name: Pack
         run: pnpm pack
       - name: Fresh DSH profile install + boot smoke
-        run: bash scripts/dsh-smoke.sh ./dsh-plugin-search-1.0.0.tgz
+        run: bash scripts/dsh-smoke.sh ./dsh-plugin-search-1.1.0.tgz
